@@ -41,11 +41,16 @@ func TrainModel
     :: use_liger
     :: wandb_project
 {
+    set -x
+
     # For debugging purposes
     export NCCL_DEBUG=WARN
 
     export WANDB_PROJECT=$wandb_project
     export WANDB_MODE=offline
+
+    export HF_HUB_OFFLINE=1
+    export TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD=1
 
     # Clean model names for directory naming
     TEXT_MODEL_CLEAN="${text_model//\//_}"
@@ -111,6 +116,7 @@ func TrainModel
         tile_grids=$(get_tile_grids $max_tiles)
         echo "Using 'tile_grids=${tile_grids}'"
         if [ "$use_lora" == "true" ]; then
+            echo "Using LoRA..."
             TRAIN_ARGS="--mm_tunable_parts=mm_vision_tower,mm_mlp_adapter"
             TRAIN_ARGS="$TRAIN_ARGS --lora_enable True"
             TRAIN_ARGS="$TRAIN_ARGS --lora_r ${lora_r}"
@@ -120,7 +126,6 @@ func TrainModel
             TRAIN_ARGS="--mm_tunable_parts=mm_vision_tower,mm_mlp_adapter,mm_language_model"
         fi
 
-        TRAIN_ARGS="--mm_tunable_parts=mm_vision_tower,mm_mlp_adapter,mm_language_model"
         TRAIN_ARGS="$TRAIN_ARGS --image_aspect_ratio anyres"
         TRAIN_ARGS="$TRAIN_ARGS --image_grid_pinpoints \"${tile_grids}\""
         TRAIN_ARGS="$TRAIN_ARGS --mm_patch_merge_type spatial_unpad"
@@ -165,7 +170,7 @@ func TrainModel
         --per_device_train_batch_size ${micro_batch_size} \
         --per_device_eval_batch_size 1 \
         --gradient_accumulation_steps ${grad_accum_steps} \
-        --evaluation_strategy "no" \
+        --eval_strategy "no" \
         --save_strategy ${save_strategy} \
         --save_steps ${save_steps} \
         $([ "$group_by_modality" == "true" ] && echo "--group_by_modality_length True" || echo "") \
@@ -289,6 +294,7 @@ task EvaluateModel
     > logs
     :: num_gpus=$eval_gpus
     :: system_prompt=$eval_system_prompt
+    :: conv_template=$finetune_prompt
     :: tasks=$eval_tasks
     :: step=$eval_step
     :: batch_size=1
@@ -326,7 +332,7 @@ task EvaluateModel
         --num_processes=${num_gpus} \
         -m lmms_eval \
         --model llava \
-        --model_args pretrained=${trained_model_dir},model_name=qwen_2${extra_model_args} \
+        --model_args pretrained=${trained_model_dir},conv_template=${conv_template}${extra_model_args} \
         --tasks ${tasks} \
         --batch_size ${batch_size} \
         --log_samples \

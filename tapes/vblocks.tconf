@@ -3,7 +3,7 @@ global {
     
     # Base repository and paths
     repo=/linkhome/rech/genrce01/ued79zb/repos/LLaVA-NeXT
-    submitter=scslurm
+    submitter=shell
     
     # Model parameters
     text_model=(
@@ -18,6 +18,7 @@ global {
             eurollm_9b="utter-project/EuroLLM-9B-Instruct"
             tower4_anthill=/lustre/fsn1/projects/rech/qjm/uar73ie/po_ckpts/Tower-4-Anthill-WPO
             tower4_sugarloaf=Unbabel/Tower-Sugarloaf-v4-WPO-beta5-epoch1-2e7-32-JZ
+            eurollm_1p7b_32k=/lustre/fswork/projects/rech/qjm/ued79zb/eurollm-1.7b-32k
     )
     vision_model=(
         VisionModel:
@@ -36,9 +37,9 @@ global {
     pretrain_prompt="plain"
     pretrain_system_from_data=false
     pretrain_gpus=4
-    pretrain_nnodes=(TextModel: qwen2p5_7b=2 towerq_7b=2 towerqmix_7b=2 towerqmix_7b_dpo=2 qwenblocks_7b=2 qwen2p5_14b=4 towerqmix_14b=4 eurollm_9b=2 tower4_anthill=2 tower4_sugarloaf=2)
+    pretrain_nnodes=(TextModel: qwen2p5_7b=2 towerq_7b=2 towerqmix_7b=2 towerqmix_7b_dpo=2 qwenblocks_7b=2 qwen2p5_14b=4 towerqmix_14b=4 eurollm_9b=2 tower4_anthill=2 tower4_sugarloaf=2 eurollm_1p7b_32k=1)
     pretrain_epochs=1
-    pretrain_micro_bsize=(TextModel: qwen2p5_7b=8 towerq_7b=8 towerqmix_7b=8 towerqmix_7b_dpo=8 qwenblocks_7b=8 qwen2p5_14b=4 towerqmix_14b=4 eurollm_9b=8 tower4_anthill=8 tower4_sugarloaf=8)
+    pretrain_micro_bsize=(TextModel: qwen2p5_7b=8 towerq_7b=8 towerqmix_7b=8 towerqmix_7b_dpo=8 qwenblocks_7b=8 qwen2p5_14b=4 towerqmix_14b=4 eurollm_9b=8 tower4_anthill=8 tower4_sugarloaf=8 eurollm_1p7b_32k=16)
     pretrain_global_bsize=256
     pretrain_lr=1e-3
     pretrain_warmup=0.05
@@ -103,11 +104,16 @@ global {
                     clip="/dev/null"
                     siglip2="/lustre/fsn1/projects/rech/qjm/ued79zb/tvision-lnext-ckpts-vblocks/pretrain/tower4_sugarloaf_siglip2"
             )
+            eurollm_1p7b_32k=(
+                VisionModel:
+                    clip="/dev/null"
+                    siglip2="/lustre/fsn1/projects/rech/qjm/ued79zb/tvision-lnext-ckpts-vblocks/pretrain/eurollm_1p7b_32k_siglip2"
+            )
     )
     finetune_compile=false
 
     # -- Finetuning parameters --
-    max_tiles=(TextModel: qwen2p5_7b=6 towerq_7b=6 towerqmix_7b=6 towerqmix_7b_dpo=6 qwenblocks_7b=6 qwen2p5_14b=6 towerqmix_14b=6 eurollm_9b=4 tower4_anthill=6 tower4_sugarloaf=6)
+    max_tiles=(TextModel: qwen2p5_7b=6 towerq_7b=6 towerqmix_7b=6 towerqmix_7b_dpo=6 qwenblocks_7b=6 qwen2p5_14b=6 towerqmix_14b=6 eurollm_9b=4 tower4_anthill=6 tower4_sugarloaf=6 eurollm_1p7b_32k=6)
     drop_images_ratio=none
     finetune_data=(
         VisionBlocksVersion:
@@ -119,11 +125,11 @@ global {
     )
     finetune_use_lora=(UseLora: false true)
     finetune_system_from_data=(VisionBlocksVersion: prototype=false v5=false v5_veno=false v6=true v6_fix=true)
-    finetune_prompt=(TextModel: qwen2p5_7b="qwen_1_5" towerq_7b="qwen_1_5" towerqmix_7b="qwen_1_5" towerqmix_7b_dpo="qwen_1_5" qwenblocks_7b="qwen_1_5" qwen2p5_14b="qwen_1_5" towerqmix_14b="qwen_1_5" eurollm_9b="qwen_1_5" tower4_anthill="gemma2_instruct" tower4_sugarloaf="gemma2_instruct")
+    finetune_prompt=(TextModel: qwen2p5_7b="qwen_1_5" towerq_7b="qwen_1_5" towerqmix_7b="qwen_1_5" towerqmix_7b_dpo="qwen_1_5" qwenblocks_7b="qwen_1_5" qwen2p5_14b="qwen_1_5" towerqmix_14b="qwen_1_5" eurollm_9b="qwen_1_5" tower4_anthill="gemma2_instruct" tower4_sugarloaf="gemma2_instruct" eurollm_1p7b_32k="qwen_1_5")
     finetune_gpus=4
-    finetune_nnodes=(TextModel: qwen2p5_7b=(VisionBlocksVersion: prototype=8 v5=8 v5_veno=8 v6=16 v6_fix=16) towerq_7b=8 towerqmix_7b=8 towerqmix_7b_dpo=8 qwenblocks_7b=8 qwen2p5_14b=16 towerqmix_14b=16 eurollm_9b=16 tower4_anthill=16 tower4_sugarloaf=16)
+    finetune_nnodes=(TextModel: qwen2p5_7b=(VisionBlocksVersion: prototype=8 v5=8 v5_veno=8 v6=16 v6_fix=16) towerq_7b=8 towerqmix_7b=8 towerqmix_7b_dpo=8 qwenblocks_7b=8 qwen2p5_14b=16 towerqmix_14b=16 eurollm_9b=16 tower4_anthill=16 tower4_sugarloaf=16 eurollm_1p7b_32k=4)
     finetune_epochs=1
-    finetune_micro_bsize=(TextModel: qwen2p5_7b=(VisionBlocksVersion: prototype=4 v5=4 v5_veno=4 v6=2 v6_fix=2) towerq_7b=4 towerqmix_7b=4 towerqmix_7b_dpo=4 qwenblocks_7b=4 qwen2p5_14b=2 towerqmix_14b=2 eurollm_9b=2 tower4_anthill=2 tower4_sugarloaf=2)
+    finetune_micro_bsize=(TextModel: qwen2p5_7b=(VisionBlocksVersion: prototype=4 v5=4 v5_veno=4 v6=2 v6_fix=2) towerq_7b=4 towerqmix_7b=4 towerqmix_7b_dpo=4 qwenblocks_7b=4 qwen2p5_14b=2 towerqmix_14b=2 eurollm_9b=2 tower4_anthill=2 tower4_sugarloaf=2 eurollm_1p7b_32k=8)
     finetune_global_bsize=128
     finetune_lr=1e-5
     finetune_vision_lr=2e-6
@@ -149,6 +155,7 @@ global {
                     eurollm_9b="/lustre/fsn1/projects/rech/qjm/ued79zb/tvision-lnext-ckpts-vblocks/finetune/eurollm_9b_v5"
                     tower4_anthill="/dev/null"
                     tower4_sugarloaf="/dev/null"
+                    eurollm_1p7b_32k="/dev/null"
             )
             v5_veno="/lustre/fsn1/projects/rech/qjm/ued79zb/tvision-lnext-ckpts-vblocks/finetune/qwen2p5_7b_v5_veno"
             v6="/lustre/fsn1/projects/rech/qjm/ued79zb/tvision-lnext-ckpts-vblocks/finetune/qwen2p5_7b_v6"
@@ -168,6 +175,7 @@ global {
                             false="/lustre/fsn1/projects/rech/qjm/ued79zb/tvision-lnext-ckpts-vblocks/finetune/tower4_sugarloaf_v6/"
                             true="/lustre/fsn1/projects/rech/qjm/ued79zb/tvision-lnext-ckpts-vblocks/finetune/tower4_sugarloaf_v6_lora/"
                     )
+                    eurollm_1p7b_32k="/lustre/fsn1/projects/rech/qjm/ued79zb/tvision-lnext-ckpts-vblocks/finetune/eurollm_1p7b_32k_v6/"
             )
     )
 
@@ -227,6 +235,7 @@ global {
                     false="Unbabel/lnext-tower4-sugarloaf-siglip2-v6"
                     true="Unbabel/lnext-tower4-sugarloaf-siglip2-v6-lora"
             )
+            eurollm_1p7b_32k=none
     )
 
     # Wandb configuration
@@ -242,7 +251,7 @@ global {
     pretrain_cpus=80
     pretrain_partition=none # "gpu"
     pretrain_qos=none
-    pretrain_nodes=(TextModel: qwen2p5_7b=2 towerq_7b=2 towerqmix_7b=2 towerqmix_7b_dpo=2 qwenblocks_7b=2 qwen2p5_14b=4 towerqmix_14b=4 eurollm_9b=2 tower4_anthill=2 tower4_sugarloaf=2)
+    pretrain_nodes=(TextModel: qwen2p5_7b=2 towerq_7b=2 towerqmix_7b=2 towerqmix_7b_dpo=2 qwenblocks_7b=2 qwen2p5_14b=4 towerqmix_14b=4 eurollm_9b=2 tower4_anthill=2 tower4_sugarloaf=2 eurollm_1p7b_32k=1)
     pretrain_gres="gpu:4"
 
     finetune_C="h100"
@@ -252,12 +261,12 @@ global {
     finetune_partition=none
     #finetune_qos=qos_gpu_h100-t4
     finetune_qos=none
-    finetune_nodes=(TextModel: qwen2p5_7b=(VisionBlocksVersion: prototype=8 v5=8 v5_veno=8 v6=16 v6_fix=16) towerq_7b=8 towerqmix_7b=8 towerqmix_7b_dpo=8 qwenblocks_7b=8 qwen2p5_14b=16 towerqmix_14b=16 eurollm_9b=16 tower4_anthill=16 tower4_sugarloaf=16)
+    finetune_nodes=(TextModel: qwen2p5_7b=(VisionBlocksVersion: prototype=8 v5=8 v5_veno=8 v6=16 v6_fix=16) towerq_7b=8 towerqmix_7b=8 towerqmix_7b_dpo=8 qwenblocks_7b=8 qwen2p5_14b=16 towerqmix_14b=16 eurollm_9b=16 tower4_anthill=16 tower4_sugarloaf=16 eurollm_1p7b_32k=4)
     finetune_gres="gpu:4"
 
     eval_C="h100"
     eval_account="qjm@h100"
-    eval_time=(TextModel: qwen2p5_7b="5:00:00" towerq_7b="5:00:00" towerqmix_7b="5:00:00" towerqmix_7b_dpo="5:00:00" qwenblocks_7b="5:00:00" qwen2p5_14b="10:00:00" towerqmix_14b="10:00:00" eurollm_9b="5:00:00" tower4_anthill="10:00:00" tower4_sugarloaf="10:00:00")
+    eval_time=(TextModel: qwen2p5_7b="5:00:00" towerq_7b="5:00:00" towerqmix_7b="5:00:00" towerqmix_7b_dpo="5:00:00" qwenblocks_7b="5:00:00" qwen2p5_14b="10:00:00" towerqmix_14b="10:00:00" eurollm_9b="5:00:00" tower4_anthill="10:00:00" tower4_sugarloaf="10:00:00" eurollm_1p7b_32k="5:00:00")
     eval_cpus=20
     eval_partition=none
     eval_qos=none
@@ -295,8 +304,13 @@ plan TowerQMix_VBlocks {
 
 plan Tower4_VBlocks {
     #reach UploadModel via (VisionBlocksVersion: v6_fix) * (TextModel: tower4_anthill) * (VisionModel: siglip2)
-    #reach UploadModel via (VisionBlocksVersion: v6_fix) * (TextModel: tower4_sugarloaf) * (VisionModel: siglip2)
-    reach UploadModel via (VisionBlocksVersion: v6_fix) * (TextModel: tower4_sugarloaf) * (VisionModel: siglip2) * (UseLora: true)
+    reach UploadModel via (VisionBlocksVersion: v6_fix) * (TextModel: tower4_sugarloaf) * (VisionModel: siglip2)
+    #reach UploadModel via (VisionBlocksVersion: v6_fix) * (TextModel: tower4_sugarloaf) * (VisionModel: siglip2) * (UseLora: true)
+}
+
+plan EuroLLM_1p7b_VBlocks {
+    #reach PretrainModel via (TextModel: eurollm_1p7b_32k) * (VisionModel: siglip2)
+    reach FinetuneModel via (VisionBlocksVersion: v6_fix) * (TextModel: eurollm_1p7b_32k) * (VisionModel: siglip2)
 }
 
 plan Ablation_VBlocks {
@@ -325,4 +339,9 @@ plan MidTrainingEvals {
     #reach UploadModel, SyncWandB via (VisionBlocksVersion: v5) * (VisionModel: siglip2)
     #reach EvaluateModel via (UseExternal: true) * (VisionBlocksVersion: v5) * (VisionModel: siglip2) * (EvalStep: v5_0p6) * (EvalTaskSets: *)
     #reach EvaluateModel via (UseExternal: true) * (VisionBlocksVersion: v6) * (VisionModel: siglip2) * (EvalStep: v6_0p4) * (EvalTaskSets: *)
+}
+
+plan Tower4_VBlocks_Eval {
+    reach ParseResults via (VisionBlocksVersion: v6_fix) * (TextModel: towerqmix_7b_dpo) * (VisionModel: siglip2) * (EvalTaskSets: alm_bench-all)
+    #reach ParseResults via (VisionBlocksVersion: v6_fix) * (TextModel: tower4_sugarloaf) * (VisionModel: siglip2) * (EvalTaskSets: alm_bench-all)
 }
